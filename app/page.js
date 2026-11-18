@@ -235,7 +235,7 @@ export default function Home() {
             </button>
             <span className="nav-line" />
             <span className="demo-label">
-              <span /> Prototipo · Grupo 2
+              <span /> Versión de prueba
             </span>
             <span className="profile" title="Sesión de prueba">
               R
@@ -607,7 +607,7 @@ export default function Home() {
           FixMatch<span> — Menos vueltas. Más soluciones.</span>
         </span>
         <span>
-          Grupo 2 <i /> Sprint 1 · Prototipo con datos de prueba
+          Versión de prueba
         </span>
       </footer>
     </>

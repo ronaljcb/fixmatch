@@ -6,7 +6,7 @@ import "./monochrome.css";
 export const metadata = {
   title: "FixMatch · Encuentra tu técnico",
   description:
-    "Elige un técnico de gasfitería y envía tu ficha para solicitar un presupuesto. Prototipo del Grupo 2.",
+    "Elige un técnico de gasfitería y envía tu ficha para solicitar un presupuesto.",
 };
 
 export default function RootLayout({ children }) {
