@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @theme inline {
   --color-background: #fafafa;
   --color-foreground: #171717;
@@ -16,8 +16,8 @@
   --color-border: #e5e5e5;
   --color-input: #dedede;
   --color-ring: #737373;
-  --radius-sm: .5rem;
-  --radius-md: .75rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 1.25rem;
 }

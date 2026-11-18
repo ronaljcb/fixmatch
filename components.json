@@ -3,7 +3,18 @@
   "style": "new-york",
   "rsc": true,
   "tsx": false,
-  "tailwind": { "config": "", "css": "app/shadcn.css", "baseColor": "slate", "cssVariables": true },
+  "tailwind": {
+    "config": "",
+    "css": "app/shadcn.css",
+    "baseColor": "slate",
+    "cssVariables": true
+  },
   "iconLibrary": "lucide",
-  "aliases": { "components": "@/components", "utils": "@/lib/utils", "ui": "@/components/ui", "lib": "@/lib", "hooks": "@/hooks" }
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
+  }
 }
