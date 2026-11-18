@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import FailureForm from "@/components/failure-form";
 import { Button } from "@/components/ui/button";
+import { partidas, soles } from "@/lib/presupuesto";
 
 const fallas = {
   fuga: "Fuga de agua",
@@ -139,18 +140,30 @@ export default function Home() {
     setView(next);
   }
   async function open(f) {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setBusy(true);
     setError("");
     try {
       f = await api(`/api/fichas/${f.id}`);
+      setFichas((previous) =>
+        previous.map((item) =>
+          item.id === f.id
+            ? { ...item, tienePresupuesto: Boolean(f.presupuesto) }
+            : item,
+        ),
+      );
+      setFicha(f);
+      setSelected("");
+      setDistrito("");
+      setEspecialidad("");
+      navigate(f.estado === "Borrador" ? "choose" : "success");
     } catch (e) {
       setError(e.message);
-      return;
+    } finally {
+      inFlight.current = false;
+      setBusy(false);
     }
-    setFicha(f);
-    setSelected("");
-    setDistrito("");
-    setEspecialidad("");
-    navigate(f.estado === "Borrador" ? "choose" : "success");
   }
   async function create(data) {
     if (inFlight.current) return;
@@ -472,15 +485,21 @@ export default function Home() {
                 </div>
                 <div className="eyebrow">SOLICITUD REGISTRADA</div>
                 <h1 ref={heading} tabIndex={-1}>
-                  ¡Ficha enviada!
+                  {ficha.presupuesto ? "Presupuesto recibido" : "¡Ficha enviada!"}
                 </h1>
-                <p>
-                  Tu ficha se guardó para <strong>{ficha.tecnicoNombre}</strong>
-                  .
-                </p>
-                <p className="muted">
-                  Puedes consultar el envío en Mis fichas.
-                </p>
+                {ficha.presupuesto ? (
+                  <p>
+                    <strong>{ficha.tecnicoNombre}</strong> envió un presupuesto
+                    para la ficha {numero(ficha)}.
+                  </p>
+                ) : (
+                  <>
+                    <p>
+                      Tu ficha se guardó para <strong>{ficha.tecnicoNombre}</strong>.
+                    </p>
+                    <p className="muted">Puedes consultar el envío en Mis fichas.</p>
+                  </>
+                )}
                 <dl className="receipt">
                   <div>
                     <dt>Número de ficha</dt>
@@ -494,7 +513,8 @@ export default function Home() {
                     <dt>Estado</dt>
                     <dd>
                       <span className="badge sent">
-                        <Icon name="check" size={12} /> Enviada
+                        <Icon name="check" size={12} />
+                        {ficha.presupuesto ? "Presupuesto recibido" : "Enviada"}
                       </span>
                     </dd>
                   </div>
@@ -503,6 +523,27 @@ export default function Home() {
                     <dd>{fecha(ficha.fechaEnvio)}</dd>
                   </div>
                 </dl>
+                {ficha.presupuesto && (
+                  <section className="quote-receipt" aria-labelledby="quote-title">
+                    <h2 id="quote-title">Detalle del presupuesto</h2>
+                    <dl className="receipt">
+                      {partidas.map(({ key, label }) => (
+                        <div key={key}>
+                          <dt>{label}</dt>
+                          <dd>{soles(ficha.presupuesto[key])}</dd>
+                        </div>
+                      ))}
+                      <div className="quote-exclusions">
+                        <dt>Exclusiones</dt>
+                        <dd>{ficha.presupuesto.exclusiones}</dd>
+                      </div>
+                      <div>
+                        <dt>Total</dt>
+                        <dd>{soles(ficha.presupuesto.total)}</dd>
+                      </div>
+                    </dl>
+                  </section>
+                )}
                 <Button className="primary" onClick={() => navigate("list")}>
                   Ver mis fichas
                   <Icon name="arrow" size={17} />
@@ -561,7 +602,7 @@ export default function Home() {
                             {f.estado === "Enviada" && (
                               <Icon name="check" size={12} />
                             )}
-                            {f.estado}
+                            {f.tienePresupuesto ? "Presupuesto recibido" : f.estado}
                           </span>
                         </div>
                         <div className="ficha-symbol">
@@ -584,11 +625,14 @@ export default function Home() {
                           </span>
                           <button
                             className="text-button"
+                            disabled={busy}
                             onClick={() => open(f)}
                           >
-                            {f.estado === "Borrador"
-                              ? "Elegir técnico"
-                              : "Ver envío"}
+                            {f.tienePresupuesto
+                              ? "Ver presupuesto"
+                              : f.estado === "Borrador"
+                                ? "Elegir técnico"
+                                : "Ver envío"}
                             <Icon name="arrow" size={16} />
                           </button>
                         </div>

@@ -9,7 +9,10 @@ export async function GET(request) {
   try {
     return json(
       await database().query(
-        `SELECT ${fichaSelect} FROM fichas f LEFT JOIN tecnicos t ON t.id=f.tecnico_id WHERE f.sesion_id=$1 ORDER BY f.fecha_creacion DESC LIMIT 100`,
+        `SELECT ${fichaSelect}, p.ficha_id IS NOT NULL AS "tienePresupuesto"
+        FROM fichas f LEFT JOIN tecnicos t ON t.id=f.tecnico_id
+        LEFT JOIN presupuestos p ON p.ficha_id=f.id
+        WHERE f.sesion_id=$1 ORDER BY f.fecha_creacion DESC LIMIT 100`,
         [owner],
       ),
     );

@@ -93,6 +93,10 @@ try {
         await (await outsider.request.get(`${base}/api/presupuestos`)).json(),
         [],
       );
+      assert.equal(
+        (await outsider.request.get(`${base}/api/fichas/${f.id}`)).status(),
+        404,
+      );
     } finally {
       if (foreignOwner)
         await sql`DELETE FROM fichas WHERE sesion_id=${foreignOwner}::uuid`;
@@ -182,6 +186,20 @@ try {
     await sql`SELECT total,materiales FROM presupuestos WHERE ficha_id=${f.id}`;
   assert.equal(saved.total, 23550);
   assert.equal(saved.materiales, 8550);
+  await page.getByRole("link", { name: "Mis fichas" }).click();
+  await page.getByText("Presupuesto recibido", { exact: true }).waitFor();
+  await page.getByRole("button", { name: "Ver presupuesto" }).click();
+  await page.getByRole("heading", { name: "Presupuesto recibido" }).waitFor();
+  const receipt = page.getByRole("region", { name: "Detalle del presupuesto" });
+  for (const value of ["S/ 120.00", "S/ 85.50", "S/ 30.00", "S/ 235.50", budget.exclusiones])
+    await receipt.getByText(value, { exact: true }).waitFor();
+  for (const width of [320, 360, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+    assert.ok(
+      await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
+      `Sin desbordamiento en el presupuesto recibido a ${width}px`,
+    );
+  }
   assert.deepEqual(jsErrors, []);
   console.log(
     "H3 verificada: cuatro campos obligatorios, cero válido, coma decimal, total exacto, sesión aislada, error recuperable, guardado único, recarga y móvil a 320/360/390/430 px.",
