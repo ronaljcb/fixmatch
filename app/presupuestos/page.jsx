@@ -20,6 +20,7 @@ import {
   partidas,
   centimos,
   soles,
+  estadosDecision,
   validarPresupuesto,
 } from "@/lib/presupuesto";
 import "./presupuesto.css";
@@ -263,7 +264,7 @@ export default function Presupuestos() {
           </div>
           <h1 ref={title} tabIndex={-1}>
             {saved && ficha
-              ? "Presupuesto enviado"
+              ? estadosDecision[saved.decision] || "Presupuesto enviado"
               : ficha
                 ? "Enviar presupuesto"
                 : "Fichas para presupuestar"}
@@ -323,7 +324,9 @@ export default function Presupuestos() {
                     <div className="budget-item-top">
                       <span>{numero(f)}</span>
                       <span className="badge">
-                        {f.presupuesto ? "Presupuesto enviado" : "Pendiente"}
+                        {f.presupuesto
+                          ? estadosDecision[f.presupuesto.decision] || "Presupuesto enviado"
+                          : "Pendiente"}
                       </span>
                     </div>
                     <h2>

@@ -97,6 +97,12 @@ try {
         (await outsider.request.get(`${base}/api/fichas/${f.id}`)).status(),
         404,
       );
+      assert.equal(
+        (await outsider.request.post(`${base}/api/fichas/${f.id}/presupuesto/decision`, {
+          data: { decision: "aceptado" },
+        })).status(),
+        404,
+      );
     } finally {
       if (foreignOwner)
         await sql`DELETE FROM fichas WHERE sesion_id=${foreignOwner}::uuid`;
@@ -200,9 +206,69 @@ try {
       `Sin desbordamiento en el presupuesto recibido a ${width}px`,
     );
   }
+  const decisionPath = `/api/fichas/${f.id}/presupuesto/decision`;
+  assert.equal((await post(decisionPath, { decision: "constructor" })).status(), 400);
+  const outsiderDecision = await browser.newContext();
+  try {
+    const response = await outsiderDecision.request.post(`${base}${decisionPath}`, {
+      data: { decision: "rechazado" },
+    });
+    assert.equal(response.status(), 401);
+  } finally {
+    await outsiderDecision.close();
+  }
+  await page.getByRole("button", { name: "Aceptar presupuesto" }).click();
+  await page.getByRole("heading", { name: "Presupuesto aceptado" }).waitFor();
+  assert.equal(await page.getByRole("button", { name: "Rechazar presupuesto" }).count(), 0);
+  const retry = await post(decisionPath, { decision: "aceptado" });
+  assert.equal(retry.status(), 200);
+  const accepted = await retry.json();
+  assert.equal(accepted.decision, "aceptado");
+  assert.ok(accepted.fechaDecision);
+  assert.equal((await post(decisionPath, { decision: "rechazado" })).status(), 409);
+  assert.equal((await post(`/api/fichas/${f.id}/presupuesto`, budget)).status(), 409);
+
+  async function createQuote(description) {
+    const response = await post("/api/fichas", {
+      tipoFalla: "atoro",
+      ubicacion: "Lavandería",
+      distrito: "Lince",
+      descripcion: description,
+    });
+    assert.equal(response.status(), 201);
+    const ficha = await response.json();
+    assert.equal((await post(`/api/fichas/${ficha.id}/enviar`, { tecnicoId: "TEC-01" })).status(), 200);
+    assert.equal((await post(`/api/fichas/${ficha.id}/presupuesto`, budget)).status(), 201);
+    return ficha;
+  }
+
+  const second = await createQuote("Presupuesto para rechazar");
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.getByText("Presupuesto aceptado", { exact: true }).waitFor();
+  const secondNumber = `FM-${String(second.numero).padStart(4, "0")}`;
+  await page
+    .getByRole("article")
+    .filter({ hasText: secondNumber })
+    .getByRole("button", { name: "Ver presupuesto" })
+    .click();
+  await page.getByRole("button", { name: "Rechazar presupuesto" }).click();
+  await page.getByRole("heading", { name: "Presupuesto rechazado" }).waitFor();
+  assert.equal(await page.getByRole("button", { name: "Aceptar presupuesto" }).count(), 0);
+
+  const concurrent = await createQuote("Presupuesto con decisiones simultáneas");
+  const concurrentPath = `/api/fichas/${concurrent.id}/presupuesto/decision`;
+  const outcomes = await Promise.all([
+    post(concurrentPath, { decision: "aceptado" }),
+    post(concurrentPath, { decision: "rechazado" }),
+  ]);
+  assert.deepEqual(outcomes.map((response) => response.status()).sort(), [200, 409]);
+  const winner = await outcomes.find((response) => response.ok()).json();
+  const detail = await context.request.get(`${base}/api/fichas/${concurrent.id}`);
+  assert.equal((await detail.json()).presupuesto.decision, winner.decision);
+
   assert.deepEqual(jsErrors, []);
   console.log(
-    "H3 verificada: cuatro campos obligatorios, cero válido, coma decimal, total exacto, sesión aislada, error recuperable, guardado único, recarga y móvil a 320/360/390/430 px.",
+    "Presupuesto verificado: formulario, detalle con fotos, vista del arrendatario, aceptación y rechazo, aislamiento, concurrencia y móvil a 320/360/390/430 px.",
   );
 } catch (error) {
   await page.screenshot({ path: `${screenshots}/error.png`, fullPage: true });
