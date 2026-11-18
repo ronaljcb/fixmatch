@@ -38,11 +38,18 @@ try {
     }),
     {},
   );
+  const photo = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 16;
+    canvas.height = 16;
+    return canvas.toDataURL("image/png");
+  });
   const created = await post("/api/fichas", {
     tipoFalla: "fuga",
     ubicacion: "Cocina",
     distrito: "Miraflores",
     descripcion: "Prueba de presupuesto",
+    fotos: [photo],
   });
   assert.equal(created.status(), 201);
   const f = await created.json();
@@ -95,6 +102,11 @@ try {
   }
   await page.goto(`${base}/presupuestos`, { waitUntil: "domcontentloaded" });
   await page.getByRole("button", { name: "Preparar presupuesto" }).click();
+  await page.getByRole("heading", { name: "Detalle de la ficha" }).waitFor();
+  await page.getByText("Prueba de presupuesto", { exact: true }).waitFor();
+  const savedPhoto = page.getByRole("img", { name: "Foto de la avería 1" });
+  await savedPhoto.waitFor();
+  assert.equal(await savedPhoto.getAttribute("src"), photo);
   await page.screenshot({
     path: `${screenshots}/01-formulario-vacio.png`,
     fullPage: true,

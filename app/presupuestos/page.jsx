@@ -31,6 +31,11 @@ const tipos = {
   atoro: "Atoro",
 };
 const numero = (f) => `FM-${String(f.numero).padStart(4, "0")}`;
+const fechaEnvio = new Intl.DateTimeFormat("es-PE", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "America/Lima",
+});
 const initial = { manoObra: "", materiales: "", visita: "", exclusiones: "" };
 async function api(path, body, signal) {
   const response = await fetch(path, {
@@ -51,6 +56,63 @@ async function api(path, body, signal) {
       { fields: data.fields },
     );
   return data;
+}
+
+function DetalleFicha({ ficha }) {
+  const [attempt, setAttempt] = useState(0);
+  const [photos, setPhotos] = useState(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    api(`/api/fichas/${ficha.id}`, undefined, controller.signal)
+      .then((detalle) => setPhotos(detalle.fotos))
+      .catch(() => {
+        if (!controller.signal.aborted) setError(true);
+      });
+    return () => controller.abort();
+  }, [ficha.id, attempt]);
+
+  return (
+    <Card className="budget-form budget-ficha-detail">
+      <CardContent>
+        <h2>Detalle de la ficha</h2>
+        <p className="muted">
+          Enviada el{" "}
+          <time dateTime={ficha.fechaEnvio}>
+            {fechaEnvio.format(new Date(ficha.fechaEnvio))}
+          </time>
+        </p>
+        <p className="budget-ficha-description">
+          {ficha.descripcion || "Sin descripción adicional."}
+        </p>
+        {error ? (
+          <>
+            <p role="alert">No se pudieron cargar las fotos.</p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setError(false);
+                setAttempt((previous) => previous + 1);
+              }}
+            >
+              Reintentar fotos
+            </Button>
+          </>
+        ) : photos === null ? (
+          <p role="status">Cargando fotos…</p>
+        ) : photos.length === 0 ? (
+          <p className="muted">Sin fotos adjuntas.</p>
+        ) : (
+          <div className="receipt-photos">
+            {photos.map((photo, index) => (
+              <img key={index} src={photo} alt={`Foto de la avería ${index + 1}`} />
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function Presupuestos() {
@@ -269,6 +331,11 @@ export default function Presupuestos() {
                     </h2>
                     <p>{f.distrito}</p>
                     <p>Técnico: {f.tecnicoNombre}</p>
+                    <p>
+                      <time dateTime={f.fechaEnvio}>
+                        {fechaEnvio.format(new Date(f.fechaEnvio))}
+                      </time>
+                    </p>
                     {f.presupuesto && (
                       <strong>{soles(f.presupuesto.total)}</strong>
                     )}
@@ -285,6 +352,7 @@ export default function Presupuestos() {
           </>
         ) : (
           <>
+            <DetalleFicha key={ficha.id} ficha={ficha} />
             {saved && (
               <Alert className="budget-success" role="status">
                 <Check />
