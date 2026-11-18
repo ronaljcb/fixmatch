@@ -6,15 +6,18 @@ Proyecto del Grupo 2 para solicitar presupuestos de gasfitería. El arrendatario
 
 Aplicación web con Next.js, React, shadcn/ui y Postgres en Neon. Incluye el registro y revisión de la ficha de falla, hasta tres fotos, selección de técnico, envío y consulta de las fichas guardadas. Diseño en blanco y negro, pensado para celular.
 
-Esta rama incluye ficha y envío (H1 y H2) y el formulario de presupuesto H3. La vista del arrendatario H4, la bandeja completa del técnico y aceptar o rechazar presupuestos siguen pendientes para el equipo. Los envíos registran datos de prueba; no envían correos ni contactan personas reales.
+El prototipo cubre el registro y envío de fichas (H1 y H2), la preparación y consulta de presupuestos (H3 y H4), la bandeja del técnico y las fotos de la ficha (H5 y H6), y la aceptación o rechazo del presupuesto (H7). Los envíos se guardan como datos de prueba en el prototipo.
 
-## Probar H3
+## Probar el recorrido completo
 
-Desde el mismo navegador, crear una ficha y enviarla a un técnico. Abrir «Técnico» en la cabecera o `/presupuestos`, elegir la ficha y completar mano de obra, materiales, visita técnica y exclusiones. El total se calcula automáticamente; los montos aceptan punto o coma decimal, hasta dos decimales, y un cero explícito cuando no corresponde un costo. Las exclusiones son texto obligatorio; se puede escribir «Ninguna».
+1. Registrar una ficha y enviarla a uno de los técnicos de prueba. La ficha admite hasta tres fotos.
+2. En el mismo navegador, abrir «Técnico» en la cabecera o `/presupuestos`. La bandeja ordena las fichas por fecha de envío. Al abrir una ficha se muestran su descripción y sus fotos.
+3. Completar mano de obra, materiales, visita técnica y exclusiones. Los montos aceptan punto o coma decimal, hasta dos decimales y un cero explícito. Si no hay exclusiones, se puede escribir «Ninguna».
+4. Volver a «Mis fichas» y abrir el presupuesto recibido. Revisar las cuatro partidas y el total, y elegir «Aceptar presupuesto» o «Rechazar presupuesto».
 
-Este modo técnico usa las fichas enviadas de la sesión actual para probar el formulario sin exponer fichas de otros navegadores. No implementa cuentas de gasfiteros ni recepción entre dispositivos. Las cuentas y roles reales requieren una integración posterior; el sprint permite usuarios de prueba.
+El modo técnico usa las fichas enviadas de la sesión actual. El cambio entre roles se simula en el mismo navegador.
 
-La tabla `presupuestos` guarda los importes en céntimos y calcula el total en la base de datos. Solo se admite un presupuesto por ficha enviada. H3 no cambia el estado de la ficha a «Presupuesto recibido»: esa transición y la vista del cliente corresponden a H4.
+La tabla `presupuestos` guarda los importes en céntimos, calcula el total y conserva una decisión por ficha. El arrendatario y el técnico ven el estado registrado al volver a abrir la ficha.
 
 ## Material de trabajo
 
@@ -66,7 +69,7 @@ npm run test:presupuesto
 npm run build
 ```
 
-La prueba de navegador utiliza Chrome instalado. Verifica formulario, fotos, revisión y edición, error de red recuperable, envío y recarga. Comprueba el ancho móvil a 320, 360, 390 y 430 píxeles. La prueba de API comprueba validaciones, aislamiento de sesiones y dos intentos simultáneos de envío. Ambas eliminan únicamente las fichas que crean para probar.
+Las pruebas de navegador utilizan Chrome instalado. Cubren el envío, el detalle con fotos, los presupuestos y su estado después de recargar. Comprueban el ancho móvil a 320, 360, 390 y 430 píxeles. Las pruebas de API verifican validación, aislamiento de sesiones y solicitudes simultáneas. Las pruebas eliminan únicamente las fichas que crean.
 
 ## Datos y sesiones de prueba
 
@@ -82,7 +85,7 @@ Vercel está conectado al repositorio y Neon está conectado al proyecto. `DATAB
 vercel deploy --yes
 ```
 
-H1 y H2 deben probarse antes de marcar sus historias como terminadas en Jira. La existencia del despliegue no acredita H3, H4 ni la aprobación de otro integrante.
+El ambiente de pruebas debe tener las migraciones hasta `004-decision-presupuesto.sql`. Registra en Jira el resultado de la prueba independiente antes de cerrar cada historia.
 
 ## Objetivo de la demo
 

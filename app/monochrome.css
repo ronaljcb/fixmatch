@@ -516,6 +516,21 @@ nav button {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+.quote-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.quote-actions > button {
+  flex: 1 1 160px;
+}
+.quote-decision:empty {
+  display: none;
+}
+.quote-decision {
+  margin-bottom: 16px;
+}
 .success .demo-note {
   color: #737373;
   font-size: 11px;

@@ -3,37 +3,21 @@ import { readFile } from "node:fs/promises";
 
 if (!process.env.DATABASE_URL) throw new Error("Falta DATABASE_URL");
 const sql = neon(process.env.DATABASE_URL);
-const migration = await readFile(
-  new URL("../db/001-inicial.sql", import.meta.url),
-  "utf8",
-);
-// Esta migración inicial no contiene funciones ni literales con punto y coma.
-await sql.transaction(
-  migration
-    .split(";")
-    .filter((s) => s.trim())
-    .map((s) => sql.query(s)),
-);
-const photos = await readFile(
-  new URL("../db/002-fotos.sql", import.meta.url),
-  "utf8",
-);
-await sql.transaction(
-  photos
-    .split(";")
-    .filter((s) => s.trim())
-    .map((s) => sql.query(s)),
-);
-const budgets = await readFile(
-  new URL("../db/003-presupuestos.sql", import.meta.url),
-  "utf8",
-);
-await sql.transaction(
-  budgets
-    .split(";")
-    .filter((s) => s.trim())
-    .map((s) => sql.query(s)),
-);
+for (const file of [
+  "001-inicial.sql",
+  "002-fotos.sql",
+  "003-presupuestos.sql",
+  "004-decision-presupuesto.sql",
+]) {
+  const migration = await readFile(new URL(`../db/${file}`, import.meta.url), "utf8");
+  // Los archivos no contienen funciones ni literales con punto y coma.
+  await sql.transaction(
+    migration
+      .split(";")
+      .filter((statement) => statement.trim())
+      .map((statement) => sql.query(statement)),
+  );
+}
 const tecnicos = JSON.parse(
   await readFile(new URL("../datos/tecnicos.json", import.meta.url), "utf8"),
 );

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import FailureForm from "@/components/failure-form";
 import { Button } from "@/components/ui/button";
-import { partidas, soles } from "@/lib/presupuesto";
+import { estadosDecision, partidas, soles } from "@/lib/presupuesto";
 
 const fallas = {
   fuga: "Fuga de agua",
@@ -108,6 +108,10 @@ export default function Home() {
   const [error, setError] = useState("");
   const heading = useRef(null);
   const inFlight = useRef(false);
+  const presupuesto = ficha?.presupuesto;
+  const estadoPresupuesto = presupuesto
+    ? estadosDecision[presupuesto.decision] || "Presupuesto recibido"
+    : null;
 
   async function load(signal) {
     setLoading(true);
@@ -149,7 +153,11 @@ export default function Home() {
       setFichas((previous) =>
         previous.map((item) =>
           item.id === f.id
-            ? { ...item, tienePresupuesto: Boolean(f.presupuesto) }
+            ? {
+                ...item,
+                tienePresupuesto: Boolean(f.presupuesto),
+                decisionPresupuesto: f.presupuesto?.decision,
+              }
             : item,
         ),
       );
@@ -158,6 +166,34 @@ export default function Home() {
       setDistrito("");
       setEspecialidad("");
       navigate(f.estado === "Borrador" ? "choose" : "success");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      inFlight.current = false;
+      setBusy(false);
+    }
+  }
+  async function decidirPresupuesto(decision) {
+    if (inFlight.current || !ficha?.presupuesto || ficha.presupuesto.decision)
+      return;
+    inFlight.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      const result = await api(`/api/fichas/${ficha.id}/presupuesto/decision`, {
+        decision,
+      });
+      setFicha((current) => ({
+        ...current,
+        presupuesto: { ...current.presupuesto, ...result },
+      }));
+      setFichas((previous) =>
+        previous.map((item) =>
+          item.id === ficha.id
+            ? { ...item, decisionPresupuesto: result.decision }
+            : item,
+        ),
+      );
     } catch (e) {
       setError(e.message);
     } finally {
@@ -485,7 +521,7 @@ export default function Home() {
                 </div>
                 <div className="eyebrow">SOLICITUD REGISTRADA</div>
                 <h1 ref={heading} tabIndex={-1}>
-                  {ficha.presupuesto ? "Presupuesto recibido" : "¡Ficha enviada!"}
+                  {estadoPresupuesto || "¡Ficha enviada!"}
                 </h1>
                 {ficha.presupuesto ? (
                   <p>
@@ -514,7 +550,7 @@ export default function Home() {
                     <dd>
                       <span className="badge sent">
                         <Icon name="check" size={12} />
-                        {ficha.presupuesto ? "Presupuesto recibido" : "Enviada"}
+                        {estadoPresupuesto || "Enviada"}
                       </span>
                     </dd>
                   </div>
@@ -523,28 +559,53 @@ export default function Home() {
                     <dd>{fecha(ficha.fechaEnvio)}</dd>
                   </div>
                 </dl>
-                {ficha.presupuesto && (
+                {presupuesto && (
                   <section className="quote-receipt" aria-labelledby="quote-title">
                     <h2 id="quote-title">Detalle del presupuesto</h2>
                     <dl className="receipt">
                       {partidas.map(({ key, label }) => (
                         <div key={key}>
                           <dt>{label}</dt>
-                          <dd>{soles(ficha.presupuesto[key])}</dd>
+                          <dd>{soles(presupuesto[key])}</dd>
                         </div>
                       ))}
                       <div className="quote-exclusions">
                         <dt>Exclusiones</dt>
-                        <dd>{ficha.presupuesto.exclusiones}</dd>
+                        <dd>{presupuesto.exclusiones}</dd>
                       </div>
                       <div>
                         <dt>Total</dt>
-                        <dd>{soles(ficha.presupuesto.total)}</dd>
+                        <dd>{soles(presupuesto.total)}</dd>
                       </div>
                     </dl>
+                    {!presupuesto.decision && (
+                      <div className="quote-actions">
+                        <Button
+                          disabled={busy}
+                          onClick={() => decidirPresupuesto("aceptado")}
+                        >
+                          Aceptar presupuesto
+                        </Button>
+                        <Button
+                          variant="outline"
+                          disabled={busy}
+                          onClick={() => decidirPresupuesto("rechazado")}
+                        >
+                          Rechazar presupuesto
+                        </Button>
+                      </div>
+                    )}
+                    <p className="quote-decision" role="status">
+                      {presupuesto.fechaDecision &&
+                        `Decisión registrada el ${fecha(presupuesto.fechaDecision)}.`}
+                    </p>
                   </section>
                 )}
-                <Button className="primary" onClick={() => navigate("list")}>
+                <Button
+                  className="primary"
+                  disabled={busy}
+                  onClick={() => navigate("list")}
+                >
                   Ver mis fichas
                   <Icon name="arrow" size={17} />
                 </Button>
@@ -602,7 +663,9 @@ export default function Home() {
                             {f.estado === "Enviada" && (
                               <Icon name="check" size={12} />
                             )}
-                            {f.tienePresupuesto ? "Presupuesto recibido" : f.estado}
+                            {f.tienePresupuesto
+                              ? estadosDecision[f.decisionPresupuesto] || "Presupuesto recibido"
+                              : f.estado}
                           </span>
                         </div>
                         <div className="ficha-symbol">
