@@ -20,8 +20,3 @@ __pycache__/
 Thumbs.db
 *.log
 .idea/
-
-.vercel
-.next/
-playwright-report/
-test-results/

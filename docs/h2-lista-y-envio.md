@@ -1,6 +1,6 @@
 # H2 Elegir técnico y enviar la ficha
 
-Referencia: historia G2F-4, boceto G2F-14 de Gabriel y construcción G2F-15 de Ronal. El flujo está implementado y cuenta con pruebas técnicas; la aceptación en Jira corresponde al equipo.
+Referencia: historia G2F-4, boceto G2F-14 de Gabriel y construcción G2F-15 de Ronal. Este documento resume el boceto adjunto; no acredita una implementación terminada.
 
 ## Comportamiento esperado
 
@@ -25,10 +25,6 @@ Los filtros por distrito y especialidad son opcionales. Si se implementan, deben
 
 ## Integración pendiente
 
-H1 y H2 usan la misma ficha en Postgres: `tipo_falla`, `ubicacion`, `distrito`, `descripcion`, `fotos`, `estado`, `tecnico_id` y `fecha_envio`. La API devuelve los nombres de campos en camelCase. Los seis técnicos están cargados en la tabla `tecnicos`.
-
-El envío utiliza una actualización condicional que exige `Borrador` y la sesión propietaria. Si otra solicitud ya envió la ficha, responde con HTTP 409. Si el guardado falla, el cliente muestra el error y conserva la solicitud; también consulta el estado real para recuperarse de respuestas de red perdidas.
-
-Para integrar H3 y H4 se necesita extender el modelo de estados y agregar presupuestos sin perder el aislamiento de las sesiones. Los datos ficticios no implican un envío real a una persona.
+El equipo debe acordar el modelo completo de ficha, el almacenamiento y la navegación con H1 y H4. El boceto especifica los campos que cambian al enviar, pero no impone un framework ni una base de datos. Los datos ficticios no implican un envío real a una persona.
 
 G2F-16 corresponde a la prueba de H2 por otro integrante. G2F-22 es la prueba de H4 y depende de la vista de presupuesto G2F-20; no forma parte de la construcción de H2.
