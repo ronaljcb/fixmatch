@@ -58,6 +58,21 @@
 .budget-form > [data-slot="card-content"] {
   padding: 0 26px;
 }
+.budget-ficha-detail {
+  margin-bottom: 24px;
+}
+.budget-ficha-detail h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.budget-ficha-detail p {
+  margin-bottom: 8px;
+}
+.budget-ficha-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 .budget-field {
   margin-bottom: 27px;
 }

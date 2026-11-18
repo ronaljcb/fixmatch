@@ -13,7 +13,8 @@ export async function GET(request) {
         'exclusiones',p.exclusiones,'total',p.total,'fechaEnvio',p.fecha_envio) END AS presupuesto
       FROM fichas f JOIN tecnicos t ON t.id=f.tecnico_id
       LEFT JOIN presupuestos p ON p.ficha_id=f.id
-      WHERE f.sesion_id=$1 AND f.estado='Enviada' ORDER BY f.fecha_envio DESC LIMIT 100`,
+      WHERE f.sesion_id=$1 AND f.estado='Enviada'
+      ORDER BY f.fecha_envio DESC, f.numero DESC LIMIT 100`,
       [owner],
     );
     return json(rows);
