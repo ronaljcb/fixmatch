@@ -225,6 +225,9 @@ export default function Home() {
             <i />
           </a>
           <nav aria-label="Navegación principal">
+            <a href="/presupuestos" className="technician-link">
+              Técnico
+            </a>
             <button
               className={view === "list" ? "nav-active" : ""}
               onClick={() => navigate("list")}
@@ -606,9 +609,7 @@ export default function Home() {
         <span className="footer-brand">
           FixMatch<span> — Menos vueltas. Más soluciones.</span>
         </span>
-        <span>
-          Versión de prueba
-        </span>
+        <span>Versión de prueba</span>
       </footer>
     </>
   );

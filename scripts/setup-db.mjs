@@ -24,6 +24,16 @@ await sql.transaction(
     .filter((s) => s.trim())
     .map((s) => sql.query(s)),
 );
+const budgets = await readFile(
+  new URL("../db/003-presupuestos.sql", import.meta.url),
+  "utf8",
+);
+await sql.transaction(
+  budgets
+    .split(";")
+    .filter((s) => s.trim())
+    .map((s) => sql.query(s)),
+);
 const tecnicos = JSON.parse(
   await readFile(new URL("../datos/tecnicos.json", import.meta.url), "utf8"),
 );

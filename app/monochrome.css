@@ -966,3 +966,18 @@ footer i {
     margin: 0 16px;
   }
 }
+
+.technician-link {
+  font-size: 12px;
+  text-decoration: none;
+  color: #525252;
+  padding: 8px 0;
+}
+@media (max-width: 360px) {
+  .header nav {
+    gap: 9px;
+  }
+  .technician-link {
+    font-size: 10px;
+  }
+}

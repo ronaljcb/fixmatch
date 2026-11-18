@@ -6,7 +6,15 @@ Proyecto del Grupo 2 para solicitar presupuestos de gasfitería. El arrendatario
 
 Aplicación web con Next.js, React, shadcn/ui y Postgres en Neon. Incluye el registro y revisión de la ficha de falla, hasta tres fotos, selección de técnico, envío y consulta de las fichas guardadas. Diseño en blanco y negro, pensado para celular.
 
-El flujo implementado cubre ficha y envío (H1 y H2). El formulario y la vista de presupuestos (H3 y H4), la bandeja del técnico y aceptar o rechazar presupuestos siguen pendientes para el equipo. Guardar «Enviada» registra la solicitud; no envía correos ni contacta personas reales.
+Esta rama incluye ficha y envío (H1 y H2) y el formulario de presupuesto H3. La vista del arrendatario H4, la bandeja completa del técnico y aceptar o rechazar presupuestos siguen pendientes para el equipo. Los envíos registran datos de prueba; no envían correos ni contactan personas reales.
+
+## Probar H3
+
+Desde el mismo navegador, crear una ficha y enviarla a un técnico. Abrir «Técnico» en la cabecera o `/presupuestos`, elegir la ficha y completar mano de obra, materiales, visita técnica y exclusiones. El total se calcula automáticamente; los montos aceptan punto o coma decimal, hasta dos decimales, y un cero explícito cuando no corresponde un costo. Las exclusiones son texto obligatorio; se puede escribir «Ninguna».
+
+Este modo técnico usa las fichas enviadas de la sesión actual para probar el formulario sin exponer fichas de otros navegadores. No implementa cuentas de gasfiteros ni recepción entre dispositivos. Las cuentas y roles reales requieren una integración posterior; el sprint permite usuarios de prueba.
+
+La tabla `presupuestos` guarda los importes en céntimos y calcula el total en la base de datos. Solo se admite un presupuesto por ficha enviada. H3 no cambia el estado de la ficha a «Presupuesto recibido»: esa transición y la vista del cliente corresponden a H4.
 
 ## Material de trabajo
 
@@ -54,6 +62,7 @@ Con el servidor local iniciado, en otra terminal:
 ```sh
 npm run test:api
 npm run test:browser
+npm run test:presupuesto
 npm run build
 ```
 
