@@ -1,0 +1,62 @@
+[
+  {
+    "id": "TEC-01",
+    "nombre": "Carlos Ramírez Soto",
+    "distrito": "Santiago de Surco",
+    "especialidad": "Fugas y tuberías",
+    "tiposFalla": [
+      "fuga",
+      "goteo"
+    ]
+  },
+  {
+    "id": "TEC-02",
+    "nombre": "María Quispe Huamán",
+    "distrito": "San Miguel",
+    "especialidad": "Atoros y desagües",
+    "tiposFalla": [
+      "atoro"
+    ]
+  },
+  {
+    "id": "TEC-03",
+    "nombre": "Jorge Salazar Ríos",
+    "distrito": "Los Olivos",
+    "especialidad": "Baja presión y bombas",
+    "tiposFalla": [
+      "baja_presion"
+    ]
+  },
+  {
+    "id": "TEC-04",
+    "nombre": "Rosa Tello Vargas",
+    "distrito": "Miraflores",
+    "especialidad": "Goteos y griferías",
+    "tiposFalla": [
+      "goteo",
+      "fuga"
+    ]
+  },
+  {
+    "id": "TEC-05",
+    "nombre": "Luis Paredes Chávez",
+    "distrito": "La Molina",
+    "especialidad": "Gasfitería general",
+    "tiposFalla": [
+      "fuga",
+      "goteo",
+      "baja_presion",
+      "atoro"
+    ]
+  },
+  {
+    "id": "TEC-06",
+    "nombre": "Ana Huertas Lozano",
+    "distrito": "Lince",
+    "especialidad": "Atoros y desagües",
+    "tiposFalla": [
+      "atoro",
+      "fuga"
+    ]
+  }
+]

@@ -1,0 +1,22 @@
+# Configuración local y secretos
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencias y resultados de compilación
+node_modules/
+dist/
+build/
+coverage/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Archivos locales
+.DS_Store
+Thumbs.db
+*.log
+.idea/
