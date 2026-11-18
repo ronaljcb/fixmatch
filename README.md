@@ -4,16 +4,15 @@ Proyecto del Grupo 2 para solicitar presupuestos de gasfitería. El arrendatario
 
 ## Estado del repositorio
 
-La rama `main` conserva la organización inicial, la documentación y los datos de prueba. La implementación de H1 y H2 está en la rama `G2F-15-ficha-y-envio`, pendiente de las pruebas de Enzo (H1) y Esteban (H2) antes de integrarse.
+Aplicación web con Next.js, React, shadcn/ui y Postgres en Neon. Incluye el registro y revisión de la ficha de falla, hasta tres fotos, selección de técnico, envío y consulta de las fichas guardadas. Diseño en blanco y negro, pensado para celular.
 
-Demo pública para revisar: https://fixmatch-pe.vercel.app.
-
-Para ejecutar la aplicación, cambiar a la rama de revisión y seguir su README. Los compañeros pueden coordinar sus cambios sobre esa rama mientras se revisa la base compartida.
+El flujo implementado cubre ficha y envío (H1 y H2). El formulario y la vista de presupuestos (H3 y H4), la bandeja del técnico y aceptar o rechazar presupuestos siguen pendientes para el equipo. Guardar «Enviada» registra la solicitud; no envía correos ni contacta personas reales.
 
 ## Material de trabajo
 
 - [Boceto de la lista de técnicos](docs/referencias/G2F-14_Boceto_lista_tecnicos.docx).
 - [Pantallas de referencia de H2](docs/referencias/h2-lista-y-confirmacion.png).
+- [Boceto de la ficha de falla](docs/referencias/h1-ficha-de-falla.png).
 - [Plan del Sprint 1 del 10 de noviembre](docs/referencias/plan-sprint-1-10-11.pdf).
 - [Alcance y criterios de H2](docs/h2-lista-y-envio.md).
 - [Seis técnicos ficticios](datos/tecnicos.json).
@@ -30,6 +29,51 @@ git switch -c G2F-15-lista-envio
 ```
 
 Cada integrante necesita acceso de escritura para subir su rama. Los cambios se proponen mediante pull requests hacia `main`, indicando la tarea de Jira y cómo se comprobaron.
+
+## Ejecutar en tu computadora
+
+Requiere Node.js 22 o superior y acceso a una base Postgres compatible con Neon.
+
+```sh
+npm ci
+```
+
+Copiar `.env.example` a `.env.local` y completar `DATABASE_URL`. Si tienes acceso al proyecto Vercel `fixmatch`, puedes obtener la configuración con `vercel env pull .env.local`. Nunca subir ese archivo al repositorio.
+
+```sh
+npm run db:setup
+npm run dev
+```
+
+Abrir `http://localhost:3000`. La preparación crea las tablas y carga seis técnicos ficticios; puede repetirse sin borrar las fichas. Las migraciones SQL están en `db/`.
+
+## Comprobar el flujo
+
+Con el servidor local iniciado, en otra terminal:
+
+```sh
+npm run test:api
+npm run test:browser
+npm run build
+```
+
+La prueba de navegador utiliza Chrome instalado. Verifica formulario, fotos, revisión y edición, error de red recuperable, envío y recarga. Comprueba el ancho móvil a 320, 360, 390 y 430 píxeles. La prueba de API comprueba validaciones, aislamiento de sesiones y dos intentos simultáneos de envío. Ambas eliminan únicamente las fichas que crean para probar.
+
+## Datos y sesiones de prueba
+
+La base guarda fichas y fotos reducidas en Postgres. Las fotos se convierten a WebP en el navegador, con un máximo de tres y 400 000 caracteres por imagen; se reservan para este prototipo pequeño. Los listados no descargan las fotos: se cargan al abrir la ficha.
+
+Cada navegador recibe una cookie aleatoria HttpOnly que identifica su sesión durante 30 días. Las consultas solo devuelven fichas de esa sesión. Esto permite la demo sin login completo: otro navegador o dispositivo tiene sus propias fichas. No hay recuperación de la sesión si se borran las cookies ni identidad personal verificada. Usar información de prueba.
+
+## Publicación
+
+Vercel está conectado al repositorio y Neon está conectado al proyecto. `DATABASE_URL` se configura como variable del servidor; nunca se envía al navegador. Para generar un despliegue de prueba desde una rama:
+
+```sh
+vercel deploy --yes
+```
+
+H1 y H2 deben probarse antes de marcar sus historias como terminadas en Jira. La existencia del despliegue no acredita H3, H4 ni la aprobación de otro integrante.
 
 ## Objetivo de la demo
 
