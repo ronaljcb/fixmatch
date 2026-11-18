@@ -499,6 +499,23 @@ nav button {
   font-size: 12px;
   color: #171717;
 }
+.quote-receipt h2 {
+  font-size: 17px;
+  font-weight: 600;
+  text-align: left;
+}
+.quote-receipt .receipt {
+  margin-top: 10px;
+}
+.receipt > .quote-exclusions {
+  display: block;
+}
+.quote-exclusions dd {
+  text-align: left;
+  margin-top: 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 .success .demo-note {
   color: #737373;
   font-size: 11px;
