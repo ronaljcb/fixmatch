@@ -4,7 +4,7 @@ Proyecto del Grupo 2 para solicitar presupuestos de gasfitería. El arrendatario
 
 ## Estado del repositorio
 
-La rama `main` conserva la organización inicial, la documentación y los datos de prueba. La implementación de H1 y H2 está en la rama `G2F-15-revision`, pendiente de las pruebas de Enzo (H1) y Esteban (H2) antes de integrarse.
+La rama `main` conserva la organización inicial, la documentación y los datos de prueba. La implementación de H1 y H2 está en la rama `G2F-15-ficha-y-envio`, pendiente de las pruebas de Enzo (H1) y Esteban (H2) antes de integrarse.
 
 Demo pública para revisar: https://fixmatch-pe.vercel.app.
 
